@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { makeStyles, AppBar, Toolbar, Typography, IconButton, Grid, Card, CardMedia, CardContent, CircularProgress, fade, TextField } from '@material-ui/core';
+import { makeStyles, AppBar, Toolbar, Typography, IconButton, Grid, Card, CardMedia, CardContent, CircularProgress, fade, TextField, Avatar } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from "@material-ui/icons/Search";
 import { toFirstCharUppercase } from "../Constants";
@@ -69,12 +69,12 @@ const Nav = (props) => {
         axios
             .get(currentPageUrl, {
                 cancelToken: new axios.CancelToken(c => cancel = c)
-              })
-                
+            })
+
             .then(response => {
                 const { data } = response;
                 const { results } = data;
-                const newPokemonData = [] ;
+                const newPokemonData = [];
                 setLoading(false)
                 setNextPageUrl(response.data.next)
                 setPrevPageUrl(response.data.previous)
@@ -88,27 +88,29 @@ const Nav = (props) => {
                 });
                 setPokemon(newPokemonData);
             });
-            return () => cancel()
-        }, [currentPageUrl])
-      ;
+        return () => cancel()
+    }, [currentPageUrl])
+        ;
 
     function gotoNextPage() {
         setCurrentPageUrl(nextPageUrl)
-      }
-    
-      function gotoPrevPage() {
-        setCurrentPageUrl(prevPageUrl)
-      }
+    }
 
-      if (loading) return "Loading..."
-  
-      
+    function gotoPrevPage() {
+        setCurrentPageUrl(prevPageUrl)
+    }
+
+    if (loading) return "Loading..."
+
+
     const handleSearchChange = (e) => {
         setFilter(e.target.value);
     };
 
     const getPokemonCard = (pokemonId) => {
         const { id, name, sprite } = pokemon[pokemonId];
+
+
         return (
             <Grid item xs={4} key={pokemonId}>
                 <Card onClick={() => history.push(`/${id}`)}>
@@ -137,13 +139,15 @@ const Nav = (props) => {
                         <Typography variant="h6" className={classes.title}>
                             Pokemon
             </Typography>
-                        <SearchIcon className={classes.searchIcon} style={{marginBottom: 20}} />
-                        <TextField  style={{marginBottom: 20}}
+                        <SearchIcon className={classes.searchIcon} style={{ marginBottom: 20 }} />
+                        <TextField style={{ marginBottom: 20, marginRight: 550 }}
+                            fullWidth
                             className={classes.searchInput}
                             onChange={handleSearchChange}
                             label="Pokemon"
                             variant="standard"
                         />
+                        <Avatar>H</Avatar>
                     </Toolbar>
                 </AppBar>
                 {pokemon ? (
@@ -151,7 +155,7 @@ const Nav = (props) => {
 
                         {Object.keys(pokemon).map(
                             (pokemonId) =>
-                                pokemon[pokemonId].name &&
+                                pokemon[pokemonId].name.includes(filter) &&
                                 getPokemonCard(pokemonId)
                         )}
                         <Pagination
