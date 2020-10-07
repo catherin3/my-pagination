@@ -3,7 +3,6 @@ import { makeStyles, AppBar, Toolbar, Typography, IconButton, Grid, Card, CardMe
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from "@material-ui/icons/Search";
 import { toFirstCharUppercase } from "../Constants";
-import { deepPurple } from '@material-ui/core/colors';
 import axios from "axios";
 import Pagination from './Button';
 //import PokemonList from './Pokemon';
@@ -48,10 +47,8 @@ const Nav = (props) => {
             width: "200px",
             margin: "5px",
         },
-        purple: {
-            color: theme.palette.getContrastText(deepPurple[500]),
-            backgroundColor: deepPurple[500],
-        },
+
+      
     }));
 
     const classes = useStyles();
