@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useCallback} from 'react';
 import { makeStyles, AppBar, Toolbar, Typography, IconButton, Grid, Card, CardMedia, CardContent, CircularProgress, fade, TextField, Avatar } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from "@material-ui/icons/Search";
@@ -58,19 +58,16 @@ const Nav = (props) => {
     const { history } = props;
     const [pokemon, setPokemon] = useState([]);
     const [filter, setFilter] = useState("");
-    const [currentPageUrl, setCurrentPageUrl] = useState("https://pokeapi.co/api/v2/pokemon")
+    const [currentPageUrl, setCurrentPageUrl] = useState("https://pokeapi.co/api/v2/pokemon?")
     const [nextPageUrl, setNextPageUrl] = useState()
     const [prevPageUrl, setPrevPageUrl] = useState()
     const [loading, setLoading] = useState(true)
+    const [number, setNumber] = useState(0);
 
-    useEffect(() => {
-        setLoading(true);
-        let cancel
-        axios
-            .get(currentPageUrl, {
-                cancelToken: new axios.CancelToken(c => cancel = c)
-            })
-
+    const fetchData = useCallback(
+        () => {
+            axios
+            .get(currentPageUrl)
             .then(response => {
                 const { data } = response;
                 const { results } = data;
@@ -78,19 +75,27 @@ const Nav = (props) => {
                 setLoading(false)
                 setNextPageUrl(response.data.next)
                 setPrevPageUrl(response.data.previous)
-                results.forEach((pokemon, index) => {
-                    newPokemonData[index + 1] = {
-                        id: index + 1,
+                let num = number
+                results.forEach((pokemon) => {
+                    newPokemonData[num + 1] = {
+                        id: num + 1,
                         name: pokemon.name,
-                        sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1
+                        sprites: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${num + 1
                             }.png`,
                     };
-                });
+                    num++;
+                });          
+                setNumber(num);
                 setPokemon(newPokemonData);
             });
-        return () => cancel()
-    }, [currentPageUrl])
-        ;
+        },
+        [currentPageUrl],
+    )
+
+    useEffect(() => {
+        setLoading(true);
+        fetchData();
+    },[fetchData]);
 
     function gotoNextPage() {
         setCurrentPageUrl(nextPageUrl)
@@ -108,7 +113,7 @@ const Nav = (props) => {
     };
 
     const getPokemonCard = (pokemonId) => {
-        const { id, name, sprite } = pokemon[pokemonId];
+        const { id, name, sprites } = pokemon[pokemonId];
 
 
         return (
@@ -116,7 +121,7 @@ const Nav = (props) => {
                 <Card onClick={() => history.push(`/${id}`)}>
                     <CardMedia
                         className={classes.cardMedia}
-                        image={sprite}
+                        image={sprites}
                         style={{ width: "130px", height: "130px" }}
                     />
                     <CardContent className={classes.cardContent}>
@@ -170,5 +175,4 @@ const Nav = (props) => {
         </div>
     );
 }
-
 export default Nav;
