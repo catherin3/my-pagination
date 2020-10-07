@@ -1,11 +1,10 @@
-import React, { useEffect, useState , useCallback} from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { makeStyles, AppBar, Toolbar, Typography, IconButton, Grid, Card, CardMedia, CardContent, CircularProgress, fade, TextField, Avatar } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from "@material-ui/icons/Search";
 import { toFirstCharUppercase } from "../Constants";
 import axios from "axios";
 import Pagination from './Button';
-//import PokemonList from './Pokemon';
 
 const Nav = (props) => {
 
@@ -48,7 +47,7 @@ const Nav = (props) => {
             margin: "5px",
         },
 
-      
+
     }));
 
     const classes = useStyles();
@@ -60,31 +59,32 @@ const Nav = (props) => {
     const [prevPageUrl, setPrevPageUrl] = useState()
     const [loading, setLoading] = useState(true)
     const [number, setNumber] = useState(0);
-
+    
+    let num = number
     const fetchData = useCallback(
         () => {
             axios
-            .get(currentPageUrl)
-            .then(response => {
-                const { data } = response;
-                const { results } = data;
-                const newPokemonData = [];
-                setLoading(false)
-                setNextPageUrl(response.data.next)
-                setPrevPageUrl(response.data.previous)
-                let num = number
-                results.forEach((pokemon) => {
-                    newPokemonData[num + 1] = {
-                        id: num + 1,
-                        name: pokemon.name,
-                        sprites: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${num + 1
-                            }.png`,
-                    };
-                    num++;
-                });          
-                setNumber(num);
-                setPokemon(newPokemonData);
-            });
+                .get(currentPageUrl)
+                .then(response => {
+                    const { data } = response;
+                    const { results } = data;
+                    const newPokemonData = [];
+                    setLoading(false)
+                    setNextPageUrl(response.data.next)
+                    setPrevPageUrl(response.data.previous)
+                    let num = number
+                    results.forEach((pokemon) => {
+                        newPokemonData[num + 1] = {
+                            id: num + 1,
+                            name: pokemon.name,
+                            sprites: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${num + 1
+                                }.png`,
+                        };
+                        num++;
+                    });
+                    setNumber(num);
+                    setPokemon(newPokemonData);
+                });
         },
         [currentPageUrl],
     )
@@ -92,7 +92,8 @@ const Nav = (props) => {
     useEffect(() => {
         setLoading(true);
         fetchData();
-    },[fetchData]);
+    }, [fetchData]);
+
 
     function gotoNextPage() {
         setCurrentPageUrl(nextPageUrl)
@@ -100,10 +101,10 @@ const Nav = (props) => {
 
     function gotoPrevPage() {
         setCurrentPageUrl(prevPageUrl)
+        setNumber(num-20)
     }
 
     if (loading) return "Loading..."
-
 
     const handleSearchChange = (e) => {
         setFilter(e.target.value);
@@ -164,6 +165,11 @@ const Nav = (props) => {
                             gotoNextPage={nextPageUrl ? gotoNextPage : null}
                             gotoPrevPage={prevPageUrl ? gotoPrevPage : null}
                         />
+
+                        {/* <div className="btn" style={{marginTop: 20}}>
+                        <button onClick={prev} style={{marginRight: 10}}>Previous</button>
+                        <button onClick={next}>next</button>
+                        </div> */}
                     </Grid>
                 ) : (
                         <CircularProgress />
